@@ -1,4 +1,5 @@
 # Gabbs [![Build Status](https://circleci.com/gh/jobandtalent/gabbs.png?style=shield)](https://circleci.com/gh/jobandtalent/gabbs) [![npm version](https://badge.fury.io/js/%40jobandtalent%2Fgabbs.svg)](https://badge.fury.io/js/%40jobandtalent%2Fgabbs)
+![npm](https://nodei.co/npm/@jobandtalent/gabbs.png?mini=true)
 
 Library for building command line tools
 
