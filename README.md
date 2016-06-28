@@ -3,10 +3,10 @@
 
 Library for building command line tools
 
+
 ### Tutorial
 
-If we want to create a command line utility called `test-gabbs`, first you need to create a bootstrap file that
-will use the `Runner` object:
+Let's create a command line utility called `test-gabbs`. First we need to create a bootstrap file:
 
 `test-gabbs.js`
 
@@ -18,10 +18,10 @@ runner.start().then((result) => {
 });
 ```
 
-Now we need to add our first parameter, for that we need to create a file with the name of the parameter in
-the folder `./command` placed at the same level than `test-gabbs.js`.
+Now we'll add our first parameter. We want to call it `hello-world` so we'll add a file with that name in the `./command` folder.
 
 `./command/hello-world.js`
+
 ```javascript
 const BaseCommand = require('@jobandtalent/gabbs').BaseCommand;
 
@@ -40,17 +40,20 @@ HelloWorld.prototype.run = function() {
 module.exports = HelloWorld;
 ```
 
-Notice how in the previous example in the method `run` we are returning a Promise, that's the way
+Notice how in the method `run` we are returning a `Promise`, that's the way
 gabbs processes asynchronous operations.
 
-Now you can run your first parameter for your `test-gabbs` command:
+Now we can run our first parameter:
 
 ```bash
 ./test-gabbs --hello-world # => Will output 'Hello world!'
 ```
 
-From inside a command you can access to the command line arguments by using the private property
-`_args`, for example:
+#### Arguments
+
+You can access to the command line arguments by using the private property `_args`.
+
+Let's use that for printing a customized message:
 
 ```javascript
 HelloWorld.prototype.run = function() {
@@ -61,36 +64,37 @@ HelloWorld.prototype.run = function() {
 };
 ```
 
-By running `./test-gabbs --hello-world "My custom hello world!"` we will display now the custom message.
+```bash
+./test-gabbs --hello-world "My custom hello world!" # => Will output 'My custom hello world!'
+```
 
-Of course you can do more complex tasks, gabbs incorportes a logger utility in order to pretty-print
-output:
+#### Logger
+
+gabbs incorportes a logger utility in order to pretty-print output:
 
 ```javascript
 const logger = require('@jobandtalent/gabbs').logger;
 
 HelloWorld.prototype.run = function() {
   return new Promise((resolve, reject) => {
-    asyncTas((err) => {
+    asyncTask((err, data) => {
       if (err) {
         logger.error('Something bad happened!');
         reject();
       } else {
         logger.log('Processed finished');
-        resolve();
+        resolve(data);
       }
     });
   });
 };
-
-module.exports = HelloWorld;
 ```
 
-#### Running tasks with Spawn
+#### Running processes
 
-In order to perform more complex tasks you can use the `Spawn` object in order to run tasks in separate threads.
+In order to implement more complex commands you can use the `Spawn` object that will let you to run external tasks.
 
-`Spawn` provides a layer of Promises so you can return it directly in your `run` method for simple operations.
+The `Spawn` object provides a layer of Promises so you can return it directly in your `run` method.
 
 ```javascript
 const Spawn = require('@jobandtalent/gabbs').Spawn;
@@ -99,17 +103,26 @@ HelloWorld.prototype.run = function() {
   const process = new Spawn();
   return process.run('sh', ['./script.sh', 'first-parameter']);
 };
+```
 
-module.exports = HelloWorld;
+You can chain subprocess execution by using [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all):
+
+```javascript
+HelloWorld.prototype.run = function() {
+  ...
+  return Promise.all([
+    process.run('sh', ['./script.sh', 'first-parameter']),
+    process.run('npm', ['install', '--dev'])
+  ]);
+};
 ```
 
 #### Accessing to the github api
 
-Another utility is the `GHApi` wrapper that encapsulates the `gh` library in order to provide a layer of Promises for
+Another utility is the `GHApi` wrapper that encapsulates the [gh](https://www.npmjs.com/package/github) library in order to provide a layer of Promises for
 accessing to the github api.
 
-Let's see an example. Suppose that we want to add a new parameter to our tool that reads a file from github as 
-in:
+Suppose that we want to add a new parameter to our tool that reads a file from github:
 
 `./command/github-test.js`
 
@@ -131,8 +144,22 @@ GithubTest.prototype.run = function() {
 };
 ```
 
-Now, with this command we have a way of reading from command line any file from github, for example
-`test-gabbs --github-test jobandtalent gabbs package.json` will read the `package.json` from this repository.
+Now, with this command we have a way of reading from command line any file from github:
+
+```bash
+# Output package.json file from the jobandtalent/gabbs repository
+./test-gabbs --github-test jobandtalent gabbs package.json
+```
+
+The `GHApi` object provides the following methods:
+
+```javascript
+connect = function(username, token) {};
+getFilesFromPullRequest = function(user, repo, id) {};
+getFileAtRevision = function(user, repo, path, ref) {};
+extractRepoInfoFromUrl = function(url) {};
+createRelease = function(owner, repo, tag) {};
+```
 
 ### License
 
