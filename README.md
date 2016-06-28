@@ -87,8 +87,6 @@ HelloWorld.prototype.run = function() {
     });
   });
 };
-
-module.exports = HelloWorld;
 ```
 
 #### Running processes
@@ -104,8 +102,6 @@ HelloWorld.prototype.run = function() {
   const process = new Spawn();
   return process.run('sh', ['./script.sh', 'first-parameter']);
 };
-
-module.exports = HelloWorld;
 ```
 
 You can chain subprocess execution by using [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all):
