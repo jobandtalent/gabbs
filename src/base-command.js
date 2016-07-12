@@ -39,7 +39,7 @@ const BaseCommand = function(args, extraParams) {
   this._homeConfig = null;
   // Try to read the configuration file
   try {
-    const Config = require(`${path.dirname(require.main.filename)}/config/commands`);
+    const Config = require(`${path.dirname(require.main.filename)}/../src/config/commands`);
     this._homeConfig = require(`${os.homedir()}/${Config.HOME_CONFIG}`);
   } catch (e) {
     // Nothing to do in case the file is not present.
